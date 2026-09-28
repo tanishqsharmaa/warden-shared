@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package warden.laya.v1;
+
+service LayaInferenceService {
+  rpc Rerank(RerankRequest) returns (RerankResponse);
+  rpc Route(RouteRequest) returns (RouteResponse);
+}
+
+message CandidateItem {
+  string candidate_id = 1;
+  string text = 2;
+}
+
+message RankedCandidate {
+  string candidate_id = 1;
+  double probability_true = 2;
+  int32 rank = 3;
+}
+
+message RerankRequest {
+  string query = 1;
+  repeated CandidateItem candidates = 2;
+  string primitive = 3; // "noul" or "score"
+}
+
+message RerankResponse {
+  string query = 1;
+  repeated RankedCandidate ranked_results = 2;
+  double inference_latency_ms = 3;
+}
+
+message RouteRequest {
+  string query = 1;
+  repeated string choices = 2;
+}
+
+message RouteResponse {
+  string query = 1;
+  string selected_choice = 2;
+  map<string, double> confidence_distribution = 3;
+  double inference_latency_ms = 4;
+}

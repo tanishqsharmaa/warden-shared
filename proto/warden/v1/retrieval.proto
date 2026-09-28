@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package warden.retrieval.v1;
+
+service RetrievalService {
+  rpc Retrieve(RetrieveRequest) returns (RetrieveResponse);
+  rpc IndexBatch(IndexBatchRequest) returns (IndexBatchResponse);
+}
+
+message Passage {
+  string doc_id = 1;
+  int32 chunk_index = 2;
+  string content = 3;
+  string source_url = 4;
+  repeated string role_tags = 5;
+  double rrf_score = 6;
+  double calibrated_score = 7;
+}
+
+message RetrieveRequest {
+  string query_text = 1;
+  string caller_role = 2;
+  int32 top_k_candidates = 3;
+  int32 final_rerank_limit = 4;
+  bool enable_reranker = 5;
+}
+
+message RetrieveResponse {
+  string query_text = 1;
+  string caller_role_applied = 2;
+  repeated Passage passages = 3;
+  bool reranker_applied = 4;
+  bool fallback_active = 5;
+  double execution_time_ms = 6;
+  int32 raw_candidates_count = 7;
+  int32 pruned_candidates_count = 8;
+}
+
+message PointData {
+  string point_id = 1;
+  string doc_id = 2;
+  int32 chunk_index = 3;
+  string content = 4;
+  repeated float dense_vector = 5;
+  repeated string role_tags = 6;
+  bool redacted = 7;
+  string source_url = 8;
+  int32 token_count = 9;
+}
+
+message IndexBatchRequest {
+  repeated PointData points = 1;
+  bool wait = 2;
+}
+
+message IndexBatchResponse {
+  string status = 1;
+  int32 points_count = 2;
+  double execution_time_ms = 3;
+}
